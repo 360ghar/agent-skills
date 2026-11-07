@@ -9,7 +9,7 @@ description: Search, compare, and act on Indian property listings (buy, rent, sh
 
 - MCP server URL: `https://api.360ghar.com/mcp`
 - Transport: Streamable HTTP
-- Auth: OAuth 2.1 with PKCE. The client opens a browser login (phone number and password). Search tools work without login.
+- Auth: OAuth 2.1 with PKCE. The client opens a browser login (phone number and password). Search, property details, and short-stay availability and pricing work without login.
 
 ## 1. Connect the MCP server
 
@@ -39,7 +39,7 @@ The client discovers the OAuth server from `https://api.360ghar.com/.well-known/
 
 ## 2. Start every session with a status check
 
-Call `user_system_status`. It tells you if the user is signed in and which features are available. If the user is a guest, use only the guest tools (search, property details, feed, amenities). Ask the user to sign in before you call any other tool.
+Call `user_system_status`. It tells you if the user is signed in and which features are available. If the user is a guest, use only the guest tools: `user_system_status`, `discovery_search`, `discovery_property_get`, `discovery_feed`, `discovery_amenities`, `bookings_check_availability`, and `bookings_get_pricing`. Ask the user to sign in before you call any other tool.
 
 ## 3. Workflows
 
@@ -53,7 +53,7 @@ Call `user_system_status`. It tells you if the user is signed in and which featu
    - `price_min`, `price_max` in INR; `bedrooms_min`, `bedrooms_max`
    - `query` for free text, for example "3 BHK near metro"
    - `limit` (max 50); pass `next_cursor` from the result as `cursor` for the next page
-3. Call `discovery_property_get` with a `property_id` from the results for full details: price, deposit, area, floor, amenities, photos, and `virtual_tour_url` / `video_tour_url` when the listing has them. The owner phone number is masked for users who are not the owner.
+3. Call `discovery_property_get` with a `property_id` from the results for full details: price, deposit, area, floor, amenities, photos, and `virtual_tour_url` / `video_tour_url` when the listing has them.
 
 For swipe-style browsing, call `discovery_feed`.
 
@@ -69,10 +69,12 @@ For swipe-style browsing, call `discovery_feed`.
 2. `visits_schedule` with `property_id` and `scheduled_date` in ISO 8601 with an offset, for example `2026-12-05T11:00:00+05:30`. The date must be in the future.
 3. `visits_list`, `visits_get`, and `visits_cancel` manage existing visits.
 
-### Book a short stay (signed in)
+### Book a short stay
+
+Steps 1 and 2 work as a guest. Step 3 needs sign-in.
 
 1. `bookings_check_availability` with `property_id`, `check_in_date`, `check_out_date` (`YYYY-MM-DD`), and `guests`.
-2. `bookings_get_pricing` with the same values. Show the total to the user.
+2. `bookings_get_pricing` with the same values. Show the total (base amount, taxes, service charges) to the user.
 3. After the user confirms, call `bookings_create`.
 4. `bookings_list`, `bookings_get`, and `bookings_cancel` (needs a `reason`) manage bookings.
 
@@ -97,7 +99,7 @@ For swipe-style browsing, call `discovery_feed`.
 - Confirm with the user before every write: swipe, visit schedule or cancel, booking create or cancel, listing create or update, availability change, lease termination, rent payment record, maintenance create or update.
 - Use only IDs that a tool returned. Never invent a `property_id`, `visit_id`, `booking_id`, `lease_id`, or `rent_charge_id`.
 - All prices are in INR. Show them in Indian format, for example ₹45,000/month or ₹1.2 Cr.
-- If a tool returns an auth-required error, tell the user to finish the 360Ghar sign-in in the browser, then retry.
+- If a tool result has `requires_auth: true`, tell the user to finish the 360Ghar sign-in in the browser, then retry.
 - Show listing links only when the tool result includes them.
 - Do not share owner or tenant personal data beyond what the tool result gives the signed-in user.
 

@@ -37,8 +37,8 @@ Pagination: list tools take `cursor` and `limit`. Pass the `next_cursor` value f
 
 | Tool | Auth | Parameters |
 | --- | --- | --- |
-| `bookings_check_availability` | Auth | `property_id`, `check_in_date`, `check_out_date`, `guests` (default 1) |
-| `bookings_get_pricing` | Auth | `property_id`, `check_in_date`, `check_out_date`, `guests` |
+| `bookings_check_availability` | Guest | `property_id`, `check_in_date`, `check_out_date`, `guests` (default 1) |
+| `bookings_get_pricing` | Guest | `property_id`, `check_in_date`, `check_out_date`, `guests` |
 | `bookings_create` | Auth | `property_id`, `check_in_date`, `check_out_date`, `guests`, `special_requests` |
 | `bookings_list` | Auth | `status`, `cursor`, `limit`, `include_total` |
 | `bookings_get` | Auth | `booking_id` |
